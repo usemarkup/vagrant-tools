@@ -19,17 +19,20 @@ function success
   echo "${GREEN}${1}${RESET}"
 }
 
-echo "Bringing up vagrant."
-cd ../
+echo "Halting vagrant"
 vagrant halt
+
+echo "Halted, reprovisioning"
 vagrant up --provision
 
 if [ $? -eq 1 ]; then
     error "Provision failed on the VM"
 fi
 
-success "Provision passed"
+success "Provision passed, attempting restart"
 vagrant halt
+echo "Halted"
 vagrant up
+echo "Back up!"
 
 success "Vagrant running - DONE!"

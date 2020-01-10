@@ -85,6 +85,9 @@ if [ -d chef/ ]; then
   if [ $? -eq 1 ]; then
       error "Berkshelf was not able to install the cookbooks correctly."
   fi
+
+  #Go back to root directory
+  cd ../
   success "Cookbooks refreshed - DONE!"
 else
   success "No chef directory found - DONE!"
