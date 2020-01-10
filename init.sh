@@ -52,13 +52,13 @@ fi
 echo "Checking VirtualBox version."
 vboxmanage --version | grep "^6\.0" > /dev/null
 if [ $? -eq 1 ]; then
-    error "Error: VirtualBox is installed but you are not using version 6.0\nPlease install the correct version from https://www.virtualbox.org/wiki/Download_Old_Builds_6_0"
+    error "VirtualBox is installed but you are not using version 6.0\nPlease install the correct version from https://www.virtualbox.org/wiki/Download_Old_Builds_6_0"
 fi
 
 echo "Checking for Vagrant."
 which vagrant > /dev/null
 if [ $? -eq 1 ]; then
-    error "Error: Vagrant is not installed! Please install it from https://www.vagrantup.com/"
+    error "Vagrant is not installed! Please install it from https://www.vagrantup.com/"
 fi
 
 echo "Making sure vagrant has the vagrant-guest plugin"
