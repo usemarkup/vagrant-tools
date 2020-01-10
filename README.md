@@ -1,2 +1,1 @@
-# vagrant-up
-Simple bash script to bring a Markup virtual machine up. This is designed to work within the Markup devops environment, its main task is to ensure all the third party packages are installed and ready to go along with bringing the virtual machine online. 
+A simple bash script to check for generic system requirements and perform a bunch of standard tasks to bring up a vagrant box to serve our various virtual environemts. If ran outside of the environment, will simply check your system has the correct requirements.

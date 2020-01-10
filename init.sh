@@ -1,41 +1,93 @@
+#!/bin/bash
+echo $1
+exit 0
 RED="$(tput setaf 1)"
 GREEN="$(tput setaf 2)"
 RESET="$(tput sgr0)"
 
+#Take a message and exit code
+function error
+{
+  echo "${RED}Error: ${1}${RESET}"
+  if [ $# -gt 1 ]; then
+    exit $2
+  else
+    exit 1
+  fi
+}
+
+function success
+{
+  echo "${GREEN}${1}${RESET}"
+}
+
 echo ""
 echo "~> Checking system for requirements"
 
-if ! [ -x "$(command -v bundler)" ]; then
-  echo "${RED}bundler is not installed, please run \"gem install bundler\"${RESET}"
-  exit 1
+echo "Checking for Ruby >= 2.3.0"
+ruby -v | grep -v "2\.3\.[-9]+" > /dev/null
+if [ $? -eq 1 ]; then
+    error "Ruby >= 2.3.x is not installed!"
 fi
 
-if ! [ -x "$(command -v vagrant)" ]; then
-  echo "${RED}vagrant is not installed, please download from https://www.vagrantup.com/${RESET}"
-  exit 1
+echo "Checking for Bundler."
+which bundler > /dev/null
+if [ $? -eq 1 ]; then
+    error "Bundler is not installed!"
 fi
 
-if ! [ -x "$(command -v executable-hooks-uninstaller)" ]; then
-  echo "${RED}executable-hook is not installed, run \"sudo gem install executable-hook\"${RESET}"
-  exit 1
+echo "Checking version of bundler."
+bundler -v | grep -v "2\.[0-9]+\.[0-9]+" > /dev/null
+if [ $? -ne 0 ]; then
+    error "Bundler 2.x is not installed, 'gem install bundler'"
 fi
 
-cd chef/
 
-echo "~> Installing gems from gemfile.lock"
+echo "Checking for Virtualbox."
+which VBoxManage > /dev/null
+if [ $? -eq 1 ]; then
+    error "Virtualbox is not installed!!"
+fi
 
+echo "Checking VirtualBox version."
+vboxmanage --version | grep "^6\.0" > /dev/null
+if [ $? -eq 1 ]; then
+    error "Error: VirtualBox is installed but you are not using version 6.0\nPlease install the correct version from https://www.virtualbox.org/wiki/Download_Old_Builds_6_0"
+fi
 
-bundle install
-rm -Rf cookbooks/
-berks vendor cookbooks
-cd ../
+echo "Checking for Vagrant."
+which vagrant > /dev/null
+if [ $? -eq 1 ]; then
+    error "Error: Vagrant is not installed! Please install it from https://www.vagrantup.com/"
+fi
 
-echo "~> vagrant: $(vagrant --version)"
-echo "~> berks: $(berks --version)"
-echo "~> ruby: $(ruby --version)"
+echo "Making sure vagrant has the vagrant-guest plugin"
+vagrant plugin list | grep vagrant-vbguest > /dev/null
+if [ $? -ne 0 ]; then
+  echo "It didn't. Installing..."
+    vagrant plugin install vagrant-vbguest
+fi
 
-vagrant halt
-vagrant up --provision
-echo "FINISHED - REBOOTING VM"
-vagrant halt
-vagrant up
+success "System requirements satisfied"
+
+if [ -d chef/ ]; then
+
+  echo "Installing gems."
+  cd chef/
+  bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --retry=3
+  if [ $? -gt 0 ]; then
+      error "Bundler was not able to install the gems correctly. Check STDOUT for more info."
+  fi
+
+  echo "Removing old cookbooks."
+  rm -Rf cookbooks/
+
+  echo "Vendoring cookbooks."
+  bundle exec berks vendor cookbooks
+  if [ $? -eq 1 ]; then
+      error "Berkshelf was not able to install the cookbooks correctly."
+  fi
+  success "Cookbooks refreshed - DONE!"
+else
+  success "No chef directory found - DONE!"
+fi
