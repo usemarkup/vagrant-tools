@@ -19,20 +19,25 @@ function success
   echo "${GREEN}${1}${RESET}"
 }
 
-echo "Halting vagrant"
-vagrant halt
 
-echo "Halted, reprovisioning"
-vagrant up --provision
+if [ -f ./Vagrantfile ]; then
+	echo "Halting vagrant"
+	vagrant halt
 
-if [ $? -eq 1 ]; then
-    error "Provision failed on the VM"
+	echo "Halted, reprovisioning"
+	vagrant up --provision
+
+	if [ $? -ne 0 ]; then
+	    error "Provision failed on the VM"
+	fi
+
+	success "Provision passed, attempting restart"
+	vagrant halt
+	echo "Halted"
+	vagrant up
+	echo "Back up!"
+
+	success "Vagrant running - DONE!"
+else
+	error "There is no Vagrantfile in this directory"
 fi
-
-success "Provision passed, attempting restart"
-vagrant halt
-echo "Halted"
-vagrant up
-echo "Back up!"
-
-success "Vagrant running - DONE!"

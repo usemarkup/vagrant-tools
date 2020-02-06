@@ -24,13 +24,13 @@ echo "~> Checking system for requirements"
 
 echo "Checking for Ruby >= 2.3.0"
 ruby -v | grep -v "2\.3\.[-9]+" > /dev/null
-if [ $? -eq 1 ]; then
+if [ $? -ne 0 ]; then
     error "Ruby >= 2.3.x is not installed!"
 fi
 
 echo "Checking for Bundler."
 which bundler > /dev/null
-if [ $? -eq 1 ]; then
+if [ $? -ne 0 ]; then
     error "Bundler is not installed!"
 fi
 
@@ -43,13 +43,13 @@ fi
 
 echo "Checking for Virtualbox."
 which VBoxManage > /dev/null
-if [ $? -eq 1 ]; then
+if [ $? -ne 0 ]; then
     error "Virtualbox is not installed!!"
 fi
 
 echo "Checking VirtualBox version."
 vboxmanage --version | grep "^6\.0" > /dev/null
-if [ $? -eq 1 ]; then
+if [ $? -ne 0 ]; then
     error "VirtualBox is installed but you are not using version 6.0\nPlease install the correct version from https://www.virtualbox.org/wiki/Download_Old_Builds_6_0"
 fi
 
@@ -73,7 +73,7 @@ if [ -d chef/ ]; then
   echo "Installing gems."
   cd chef/
   bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --retry=3
-  if [ $? -gt 0 ]; then
+  if [ $? -ne 0 ]; then
       error "Bundler was not able to install the gems correctly. Check STDOUT for more info."
   fi
 
@@ -82,7 +82,7 @@ if [ -d chef/ ]; then
 
   echo "Vendoring cookbooks."
   bundle exec berks vendor cookbooks
-  if [ $? -eq 1 ]; then
+  if [ $? -ne 0 ]; then
       error "Berkshelf was not able to install the cookbooks correctly."
   fi
 
