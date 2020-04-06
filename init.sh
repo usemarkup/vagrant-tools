@@ -34,11 +34,12 @@ if [ $? -ne 0 ]; then
     error "Bundler is not installed!"
 fi
 
-echo "Checking version of bundler."
-bundler -v | grep -v "2\.[0-9]+\.[0-9]+" > /dev/null
-if [ $? -ne 0 ]; then
-    error "Bundler 2.x is not installed, 'gem install bundler'"
-fi
+# short term removing this as it seems to cause more issues than its worth
+#echo "Checking version of bundler."
+#bundler -v | grep -v "2\.[0-9]+\.[0-9]+" > /dev/null
+#if [ $? -ne 0 ]; then
+#    error "Bundler 2.x is not installed, 'gem install bundler'"
+#fi
 
 
 echo "Checking for Virtualbox."
