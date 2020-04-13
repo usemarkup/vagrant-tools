@@ -49,9 +49,9 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Checking VirtualBox version."
-vboxmanage --version | grep "^6\.0" > /dev/null
+vboxmanage --version | grep "^6" > /dev/null
 if [ $? -ne 0 ]; then
-    error "VirtualBox is installed but you are not using version 6.0\nPlease install the correct version from https://www.virtualbox.org/wiki/Download_Old_Builds_6_0"
+    error "VirtualBox is installed but you need to be using a version in the 6.x range."
 fi
 
 echo "Checking for Vagrant."
